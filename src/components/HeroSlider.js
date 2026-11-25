@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, Cloud, Globe, Landmark, Megaphone, Users } from 'lucide-react';
 import governmentHeroImage from '../../assets/6.png';
 import crmHeroImage from '../../assets/7.png';
+
+const INTERVAL = 4000; // 4 seconds between slides
 
 const NODES = [[Globe, 'Web'], [Megaphone, 'Marketing'], [Users, 'CRM'], [Cloud, 'Cloud'], [Landmark, 'Government']];
 
@@ -25,55 +27,42 @@ function Orbit() {
   );
 }
 
-/* ── Slide 2: 3D Rotating Rings (reference image style) ── */
 function Rings3D() {
   return (
     <div className="rings3d-wrap" aria-hidden="true">
       <div className="rings3d">
-        {/* Crystal cubes */}
         <div className="rg-cube" />
         <div className="rg-cube" />
         <div className="rg-cube" />
         <div className="rg-cube" />
-        {/* Orbiting silver dots */}
         <div className="rg-dot" />
         <div className="rg-dot" />
         <div className="rg-dot" />
-        {/* Rings */}
         <div className="rg rg1" />
         <div className="rg rg2" />
         <div className="rg rg3" />
-        {/* Glowing core */}
         <div className="rg-core" />
       </div>
     </div>
   );
 }
 
-/* ── Slide 4: 3D Animated Cloud ── */
 function Cloud3D() {
   return (
     <div className="cloud3d-wrap" aria-hidden="true">
       <div className="cloud3d-scene">
-        {/* Floating particles */}
         <div className="cloud3d-particle" />
         <div className="cloud3d-particle" />
         <div className="cloud3d-particle" />
         <div className="cloud3d-particle" />
         <div className="cloud3d-particle" />
-
-        {/* Cloud body with extra puffs */}
         <div className="cloud3d-body">
           <div className="cloud3d-puff p1" />
           <div className="cloud3d-puff p2" />
         </div>
-
-        {/* Data lines falling from cloud */}
         <div className="cloud3d-data">
           <span /><span /><span /><span /><span /><span />
         </div>
-
-        {/* Shield icon */}
         <div className="cloud3d-shield">
           <svg width="52" height="60" viewBox="0 0 52 60" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -82,11 +71,8 @@ function Cloud3D() {
               stroke="rgba(140,210,255,0.70)"
               strokeWidth="1.5"
             />
-            {/* Lock body */}
             <rect x="18" y="30" width="16" height="12" rx="2" fill="rgba(255,255,255,0.90)" />
-            {/* Lock shackle */}
             <path d="M20 30V26a6 6 0 0 1 12 0v4" stroke="rgba(255,255,255,0.90)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-            {/* Keyhole */}
             <circle cx="26" cy="36" r="2" fill="rgba(60,120,230,0.80)" />
             <defs>
               <linearGradient id="shieldGrad" x1="4" y1="2" x2="48" y2="57" gradientUnits="userSpaceOnUse">
@@ -110,7 +96,7 @@ const SLIDES = [
     cta: [['Start your project', '/contact'], ['Government solutions', '/government']],
     bgImage: governmentHeroImage,
     bgAlt: 'IT solutions digital city',
-    overlay: 'rgba(10, 15, 40, 0.62)',
+    overlay: 'rgba(10, 15, 40, 0.65)',
     imgDir: 'right',
     extra: <div className="slide-orbit-overlay"><Orbit /></div>,
   },
@@ -157,34 +143,39 @@ const SLIDES = [
 ];
 
 export default function HeroSlider() {
-  const [idx, setIdx]       = useState(0);
-  const [paused, setPaused] = useState(false);
-  // Increments on every slide change — used as React key to replay CSS animations
+  const [idx, setIdx]     = useState(0);
   const [animKey, setAnimKey] = useState(0);
+  const timerRef = useRef(null);
 
+  // Start/restart the auto-advance timer
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    timerRef.current = setInterval(() => {
+      setIdx((v) => (v + 1) % SLIDES.length);
+      setAnimKey((k) => k + 1);
+    }, INTERVAL);
+  }, []);
+
+  // Boot on mount, clean up on unmount
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [startTimer]);
+
+  // Manual navigation — restart the timer so the next auto-advance
+  // counts from the moment the user interacted
   const go = useCallback((n) => {
     setIdx((n + SLIDES.length) % SLIDES.length);
     setAnimKey((k) => k + 1);
-  }, []);
-
-  useEffect(() => {
-    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setTimeout(() => {
-      setIdx((v) => (v + 1) % SLIDES.length);
-      setAnimKey((k) => k + 1);
-    }, 6500);
-    return () => clearTimeout(t);
-  }, [idx, paused]);
+    startTimer();
+  }, [startTimer]);
 
   return (
     <section
       className="hero hero-fullbg"
       aria-roledescription="carousel"
       aria-label="Highlights"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
     >
       {/* Background image layers */}
       {SLIDES.map((s, n) => (
@@ -208,8 +199,13 @@ export default function HeroSlider() {
         </div>
       ))}
 
-      <button type="button" className="hero-arrow left" onClick={() => go(idx - 1)} aria-label="Previous slide"><ChevronLeft size={26} /></button>
-      <button type="button" className="hero-arrow right" onClick={() => go(idx + 1)} aria-label="Next slide"><ChevronRight size={26} /></button>
+      {/* Nav arrows */}
+      <button type="button" className="hero-arrow left" onClick={() => go(idx - 1)} aria-label="Previous slide">
+        <ChevronLeft size={22} />
+      </button>
+      <button type="button" className="hero-arrow right" onClick={() => go(idx + 1)} aria-label="Next slide">
+        <ChevronRight size={22} />
+      </button>
 
       <div className="container hero-stage">
         {SLIDES.map((s, n) => {
@@ -222,7 +218,7 @@ export default function HeroSlider() {
               role="group"
               aria-label={`Slide ${n + 1} of ${SLIDES.length}`}
             >
-              {/* LEFT — text copy */}
+              {/* LEFT — text */}
               <div className="slide-copy slide-copy-light">
                 <p
                   key={`badge-${n}-${active ? animKey : 'idle'}`}
@@ -230,7 +226,6 @@ export default function HeroSlider() {
                 >
                   {s.badge}
                 </p>
-
                 <h1
                   key={`title-${n}-${active ? animKey : 'idle'}`}
                   className={`hero-title hero-title-light${active ? ' sa-title' : ''}`}
@@ -238,36 +233,26 @@ export default function HeroSlider() {
                   {s.title}{' '}
                   <span className="accent accent-light">{s.accent}</span>
                 </h1>
-
                 <p
                   key={`sub-${n}-${active ? animKey : 'idle'}`}
                   className={`hero-sub hero-sub-light${active ? ' sa-sub' : ''}`}
                 >
                   {s.text}
                 </p>
-
                 <div
                   key={`cta-${n}-${active ? animKey : 'idle'}`}
                   className={`hero-cta${active ? ' sa-cta' : ''}`}
                 >
-                  <Link
-                    href={s.cta[0][1]}
-                    className="btn btn-primary btn-lg"
-                    tabIndex={active ? 0 : -1}
-                  >
+                  <Link href={s.cta[0][1]} className="btn btn-primary btn-lg" tabIndex={active ? 0 : -1}>
                     {s.cta[0][0]} <ArrowUpRight size={18} />
                   </Link>
-                  <Link
-                    href={s.cta[1][1]}
-                    className="btn btn-ghost-light btn-lg"
-                    tabIndex={active ? 0 : -1}
-                  >
+                  <Link href={s.cta[1][1]} className="btn btn-ghost-light btn-lg" tabIndex={active ? 0 : -1}>
                     {s.cta[1][0]}
                   </Link>
                 </div>
               </div>
 
-              {/* RIGHT — art / orbit / 3d element / badge */}
+              {/* RIGHT — art / orbit — shown on desktop, also shown on mobile for slide 1 (orbit) */}
               <div className="slide-art slide-art-fullbg">
                 {active ? (
                   <div key={`art-${n}-${animKey}`} className="sa-art-inner">
@@ -284,7 +269,7 @@ export default function HeroSlider() {
 
       {/* Progress dots */}
       <div className="hero-dots hero-dots-light" role="tablist" aria-label="Choose slide">
-        {SLIDES.map((s, n) => (
+        {SLIDES.map((_, n) => (
           <button
             key={n}
             type="button"
@@ -296,7 +281,7 @@ export default function HeroSlider() {
           >
             <span
               key={`dot-${n}-${idx === n ? animKey : 'x'}`}
-              style={n === idx && !paused ? { animationDuration: '6.5s' } : undefined}
+              style={n === idx ? { animationDuration: `${INTERVAL}ms` } : undefined}
             />
           </button>
         ))}
