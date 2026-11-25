@@ -1,0 +1,82 @@
+export const BLOGS = [
+  {
+    slug: 'website-cost-india-2026',
+    title: 'How much does a business website cost in India in 2026?',
+    excerpt: 'A plain breakdown of what drives website pricing, from static brochure sites to online stores, and what to ask before you pay.',
+    category: 'Web Development', date: '2026-10-14', read: '4 min read',
+    body: [
+      ['p', 'Website prices in India range from a few thousand rupees to several lakhs. The gap is not random. It comes down to four things: how many pages you need, whether content must be editable, whether you sell online, and who handles hosting and SEO.'],
+      ['h', 'The usual price bands'],
+      ['p', 'A static business website with domain, hosting and basic SEO usually sits around ₹15,000. A single landing page for ads is lower, around ₹10,000. A dynamic website with an admin panel starts near ₹30,000, and a simple online store near ₹40,000 without third-party integrations.'],
+      ['h', 'What to check before you pay'],
+      ['p', 'Ask whether domain and hosting are included, who owns the code and content, how many revisions you get, and whether the site is mobile-responsive and SEO-ready. A cheap quote that leaves these out often costs more later.'],
+      ['p', 'The safest approach is a short written brief. It lets any agency quote the same scope, so you compare like with like.'],
+    ],
+  },
+  {
+    slug: 'static-vs-dynamic-website',
+    title: 'Static or dynamic website: which one does your business need?',
+    excerpt: 'If you update content often, a dynamic site saves money. If you rarely do, a static site is faster and cheaper.',
+    category: 'Web Development', date: '2026-10-07', read: '3 min read',
+    body: [
+      ['p', 'A static website shows the same pages to everyone and changes only when a developer edits it. A dynamic website pulls content from a database, so you can add a blog post or a product from an admin panel.'],
+      ['h', 'Choose static when'],
+      ['p', 'Your content rarely changes: a clinic profile, consultant portfolio or company introduction. Static sites load very fast, are easy to secure and cost less.'],
+      ['h', 'Choose dynamic when'],
+      ['p', 'You publish news, blogs, listings or client portals, or you want your own team to manage content. The admin panel pays for itself after a few updates.'],
+    ],
+  },
+  {
+    slug: 'google-business-profile-top-5',
+    title: 'Local SEO checklist: reach the top 5 on Google Maps',
+    excerpt: 'The Google Business Profile steps that move a local business into the map pack and bring in calls.',
+    category: 'Digital Marketing', date: '2026-09-29', read: '5 min read',
+    body: [
+      ['p', 'When someone searches for a service near them, Google shows three to five businesses on a map. Those listings get most of the calls. Reaching them is mostly about a complete, consistent and active profile.'],
+      ['h', 'Start with the basics'],
+      ['p', 'Pick the most accurate primary category, add every service you offer, keep your name, address and phone number identical everywhere, and upload real photos of your shop, team and work.'],
+      ['h', 'Keep it active'],
+      ['p', 'Post updates regularly, answer questions, and ask happy customers for reviews. Reply to every review, good or bad. Activity signals to Google that the business is open and trusted.'],
+    ],
+  },
+  {
+    slug: 'why-your-business-needs-a-crm',
+    title: 'Why growing businesses need a CRM, not another spreadsheet',
+    excerpt: 'Missed follow-ups cost real revenue. Here is when a CRM starts paying for itself.',
+    category: 'CRM', date: '2026-09-18', read: '4 min read',
+    body: [
+      ['p', 'Most small businesses begin with a spreadsheet and WhatsApp. It works until the team grows and nobody is sure who called which lead, or when the next follow-up is due.'],
+      ['h', 'What a CRM fixes'],
+      ['p', 'Every enquiry lands in one pipeline with an owner and a status. Reminders prompt follow-ups, client history is visible to the whole team, and a dashboard shows conversions and revenue without manual reports.'],
+      ['p', 'If you handle more than a few leads a week, or if more than one person talks to customers, you are already at the point where a CRM saves time and money.'],
+    ],
+  },
+  {
+    slug: 'documents-for-government-it-tenders',
+    title: 'Documents IT vendors usually need for government tenders',
+    excerpt: 'A practical checklist of registrations and certificates that tender documents commonly ask for.',
+    category: 'Government', date: '2026-09-09', read: '4 min read',
+    body: [
+      ['p', 'Requirements differ from tender to tender, so always read the bid document. Still, a handful of documents appear again and again, and having them ready saves days.'],
+      ['h', 'Common requests'],
+      ['p', 'Business registration (company or LLP), PAN and GST registration, MSME / Udyam registration, Startup recognition where relevant, a quality certification such as ISO 9001, proof of past work, and financial statements.'],
+      ['h', 'Keep them current'],
+      ['p', 'Check validity dates and make sure the address and business name match across every document. Small mismatches are a common reason for queries during evaluation.'],
+    ],
+  },
+  {
+    slug: 'aws-vs-azure-small-business',
+    title: 'AWS or Azure: how a small business should choose',
+    excerpt: 'Both are excellent. The right pick depends on your team, your tools and your budget.',
+    category: 'Cloud', date: '2026-08-27', read: '4 min read',
+    body: [
+      ['p', 'For most small businesses, either platform can host a website, store files and run applications reliably. The difference lies in what you already use and who will manage it.'],
+      ['h', 'Pick Azure when'],
+      ['p', 'Your team lives in Microsoft 365 and needs sign-in and identity to work smoothly with Windows-based tools.'],
+      ['h', 'Pick AWS when'],
+      ['p', 'You want the widest range of services and community support, or you are building a modern web product with serverless functions and global delivery.'],
+      ['p', 'Whichever you choose, set billing alerts on day one and apply least-privilege access. Those two habits prevent most expensive surprises.'],
+    ],
+  },
+];
+export const getBlog = (slug) => BLOGS.find((b) => b.slug === slug);
